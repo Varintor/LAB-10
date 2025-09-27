@@ -6,6 +6,7 @@ import { useMessageStore } from '@/stores/message'
 import EventService from '@/services/EventService'
 import OrganizerService from '@/services/OrganizerService'  // ✅ เพิ่ม OrganizerService
 import BaseInput from '@/components/BaseInput.vue'
+import BaseSelect from '@/components/BaseSelect.vue'
 
 
 
@@ -57,43 +58,53 @@ function saveEvent() {
 </script>
 
 <template>
-  <div>
-    <h1>Create an Event</h1>
-    <form @submit.prevent="saveEvent">
-      <!-- Base Inputs -->
-      <BaseInput v-model="event.category" type="text" label="Category" />
-      <BaseInput v-model="event.title" type="text" label="Title" />
-      <BaseInput v-model="event.description" type="text" label="Description" />
-      <BaseInput v-model="event.location" type="text" label="Location" />
-      <BaseInput v-model="event.date" type="date" label="Date" />
-      <BaseInput v-model="event.time" type="time" label="Time" />
+  <div class="event-form">
+    <h1 class="title">Create an Event</h1>
 
-      <!-- Organizer Dropdown -->
-      <h3>Who is your organizer?</h3>
-      <div class="field">
-        <label for="organizer">Select an Organizer</label>
-        <select id="organizer" v-model="event.organizer.id">
-          <option disabled value="0">-- Please select an organizer --</option>
-          <option 
-            v-for="option in organizers" 
-            :key="option.id" 
-            :value="option.id"
-          >
-            {{ option.name }}
-          </option>
-        </select>
-      </div>
+    <form @submit.prevent="saveEvent" class="form-container">
+      <!-- Event Info -->
+      <section>
+        <h2 class="section-title">Event Info</h2>
+        <BaseInput v-model="event.category" type="text" label="Category" />
+        <BaseInput v-model="event.title" type="text" label="Title" />
+        <BaseInput v-model="event.description" type="text" label="Description" />
+      </section>
 
-      <!-- Pets Allowed -->
-      <div class="field checkbox">
-        <label>
-          <input v-model="event.petsAllowed" type="checkbox" />
-          Pets allowed?
-        </label>
-      </div>
+      <!-- Location & Date -->
+      <section>
+        <h2 class="section-title">Details</h2>
+        <BaseInput v-model="event.location" type="text" label="Location" />
+        <div class="grid">
+          <BaseInput v-model="event.date" type="date" label="Date" />
+          <BaseInput v-model="event.time" type="time" label="Time" />
+        </div>
+      </section>
+
+      <!-- Organizer -->
+      <section>
+        <h2 class="section-title">Organizer</h2>
+        <BaseSelect
+          v-model="event.organizer.id"
+          :options="organizers"
+          label="Select Organizer"
+        />
+      </section>
+
+      <!-- Other -->
+      <section>
+        <h2 class="section-title">Other</h2>
+        <div class="field checkbox">
+          <label>
+            <input v-model="event.petsAllowed" type="checkbox" />
+            Pets allowed?
+          </label>
+        </div>
+      </section>
 
       <!-- Submit -->
-      <button class="button -fill-gradient" type="submit">Submit</button>
+      <div class="actions">
+        <button class="button -fill-gradient" type="submit">Submit</button>
+      </div>
     </form>
 
     <!-- Debug -->
@@ -101,42 +112,61 @@ function saveEvent() {
   </div>
 </template>
 
+
 <style scoped>
-h1 {
-  margin-bottom: 1rem;
+.event-form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.field {
-  margin-bottom: 1rem;
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.form-container {
   display: flex;
   flex-direction: column;
+  gap: 2rem;
 }
 
-.field label {
+.section-title {
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 0.3rem;
+  margin-bottom: 1rem;
+  color: #16c0b0;
 }
 
-input,
-textarea {
-  padding: 8px 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
-.checkbox {
-  flex-direction: row;
+.field.checkbox {
+  display: flex;
   align-items: center;
+  gap: 0.5rem;
+}
+
+.actions {
+  text-align: center;
 }
 
 .button {
   background: linear-gradient(to right, #16c0b0, #84cf6a);
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
+  padding: 12px 24px;
+  border-radius: 8px;
   color: white;
   font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
   transition: transform 0.2s;
 }
@@ -145,3 +175,4 @@ textarea {
   transform: scale(1.05);
 }
 </style>
+
