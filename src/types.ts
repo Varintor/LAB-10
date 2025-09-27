@@ -1,5 +1,5 @@
 export interface Organizer {
-  id: number
+  id?: number
   name: string
 }
 

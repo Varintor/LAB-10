@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import OrganizerService from '@/services/EventService'
+import OrganizerService from '@/services/OrganizerService'
 import OrganizerCard from '@/components/OrganizerCard.vue'
 
 const organizers = ref<any[]>([])

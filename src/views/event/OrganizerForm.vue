@@ -1,83 +1,104 @@
 <script setup lang="ts">
+import type { Organizer } from '@/types'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import OrganizerService from '@/services/EventService'
 import { useMessageStore } from '@/stores/message'
-
-const organizer = ref({
-  id: 0,               // ให้ backend generate
-  organizerName: '',
-  address: ''
-})
+import OrganizerService from '@/services/OrganizerService'
+import BaseInput from '@/components/BaseInput.vue'
 
 const router = useRouter()
 const store = useMessageStore()
 
+// ✨ Organizer object ที่จะส่งไป backend
+const organizer = ref<Organizer>({
+  name: '',
+})
+
 function saveOrganizer() {
   console.log("👉 Sending organizer:", organizer.value)
-  OrganizerService.addOrganizer(organizer.value)
+
+  OrganizerService.saveOrganizer({
+    name: organizer.value.name   // ✅ ส่งแค่ name
+  })
     .then((response) => {
-      // หลังจาก save เสร็จ redirect ไปหน้า list หรือ detail
-      //router.push({ name: 'organizer-list-view' })
-      store.updateMessage('You successfully added organizer: ' + response.data.organizerName)
-      setTimeout(() => {
-        store.resetMessage()
-      }, 3000)
-    })
-    .catch((err) => {
-      console.error("❌ Save failed:", err)
-      router.push({ name: 'network-error-view' })
+      console.log("👉 Saved organizer:", response.data)
+      if (response.data && response.data.id) {
+        router.push({ name: 'organizer-detail', params: { id: response.data.id } })
+      } else {
+        store.updateMessage('✅ Added organizer, but no ID returned')
+      }
     })
 }
 </script>
 
 <template>
-  <div>
-    <h1>Create an Organizer</h1>
-    <form @submit.prevent="saveOrganizer">
-      <div class="field">
-        <label for="organizerName">Organizer Name</label>
-        <input id="organizerName" v-model="organizer.organizerName" type="text" placeholder="Organizer Name" required />
-      </div>
+  <div class="organizer-form">
+    <h1 class="title">Add Organizer</h1>
 
-      <div class="field">
-        <label for="address">Address</label>
-        <input id="address" v-model="organizer.address" type="text" placeholder="Address" required />
-      </div>
+    <form @submit.prevent="saveOrganizer" class="form-container">
+      <!-- Organizer Name -->
+      <section>
+        <h2 class="section-title">Organizer Info</h2>
+        <BaseInput v-model="organizer.name" type="text" label="Organizer Name" />
+      </section>
 
-      <button class="button -fill-gradient" type="submit">Submit</button>
+      <!-- Submit -->
+      <div class="actions">
+        <button class="button -fill-gradient" type="submit">Submit</button>
+      </div>
     </form>
 
+    <!-- Debug -->
     <pre>{{ organizer }}</pre>
   </div>
 </template>
 
 <style scoped>
-.field {
-  margin-bottom: 1rem;
+.organizer-form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.form-container {
   display: flex;
   flex-direction: column;
+  gap: 2rem;
 }
-.field label {
+
+.section-title {
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 0.3rem;
+  margin-bottom: 1rem;
+  color: #16c0b0;
 }
-input {
-  padding: 8px 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+
+.actions {
+  text-align: center;
 }
+
 .button {
   background: linear-gradient(to right, #16c0b0, #84cf6a);
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
+  padding: 12px 24px;
+  border-radius: 8px;
   color: white;
   font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
   transition: transform 0.2s;
 }
+
 .button:hover {
   transform: scale(1.05);
 }

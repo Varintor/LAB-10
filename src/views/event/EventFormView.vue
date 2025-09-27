@@ -13,7 +13,7 @@ import BaseSelect from '@/components/BaseSelect.vue'
 const organizers = ref<Organizer[]>([])   // ✅ dropdown list
 
 onMounted(() => {
-  OrganizerService.getOrganizers()
+  OrganizerService.getOrganizers(5, 1)   // ✅ ดึงข้อมูล organizer มาแสดงใน dropdown
     .then((response) => {
       organizers.value = response.data
     })
