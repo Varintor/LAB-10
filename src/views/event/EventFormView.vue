@@ -4,15 +4,21 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessageStore } from '@/stores/message'
 import EventService from '@/services/EventService'
-import OrganizerService from '@/services/EventService'
+import OrganizerService from '@/services/OrganizerService'  // ✅ เพิ่ม OrganizerService
+import BaseInput from '@/components/BaseInput.vue'
+
 
 
 const organizers = ref<Organizer[]>([])   // ✅ dropdown list
 
 onMounted(() => {
-  OrganizerService.getOrganizers(100, 1).then((res) => {
-    organizers.value = res.data
-  })
+  OrganizerService.getOrganizers()
+    .then((response) => {
+      organizers.value = response.data
+    })
+    .catch(() => {
+      console.error("❌ Fetch organizers failed:")
+    })
 })
 
 const event = ref<Event>({
@@ -24,7 +30,10 @@ const event = ref<Event>({
   date: '',
   time: '',
   petsAllowed: false,
-  organizer: null
+  organizer: {
+    id: 0,
+    name: ''
+  }
 })
 
 const router = useRouter()
@@ -32,13 +41,12 @@ const store = useMessageStore()
 
 function saveEvent() {
   console.log("👉 Sending event:", event.value)
-  EventService.saveEvent(event.value)
+
+  EventService.saveEvent({ ...event.value })   // 🔥 แก้จาก event.value → { ...event.value }
     .then((response) => {
       router.push({ name: 'event-detail-view', params: { id: response.data.id } })
       store.updateMessage('You successfully added event: ' + response.data.title)
-      setTimeout(() => {
-        store.resetMessage()
-      }, 3000)
+      setTimeout(() => store.resetMessage(), 3000)
     })
     .catch((err) => {
       console.error("❌ Save failed:", err)
@@ -52,51 +60,31 @@ function saveEvent() {
   <div>
     <h1>Create an Event</h1>
     <form @submit.prevent="saveEvent">
-      <div class="field">
-        <label for="category">Category</label>
-        <input id="category" v-model="event.category" type="text" placeholder="Category" required />
-      </div>
+      <!-- Base Inputs -->
+      <BaseInput v-model="event.category" type="text" label="Category" />
+      <BaseInput v-model="event.title" type="text" label="Title" />
+      <BaseInput v-model="event.description" type="text" label="Description" />
+      <BaseInput v-model="event.location" type="text" label="Location" />
+      <BaseInput v-model="event.date" type="date" label="Date" />
+      <BaseInput v-model="event.time" type="time" label="Time" />
 
-      <h3>Name & describe your event</h3>
+      <!-- Organizer Dropdown -->
+      <h3>Who is your organizer?</h3>
       <div class="field">
-        <label for="title">Title</label>
-        <input id="title" v-model="event.title" type="text" placeholder="Title" required />
-      </div>
-
-      <div class="field">
-        <label for="description">Description</label>
-        <textarea id="description" v-model="event.description" placeholder="Write a short description..."></textarea>
-      </div>
-
-      <h3>Where is your event?</h3>
-      <div class="field">
-        <label for="location">Location</label>
-        <input id="location" v-model="event.location" type="text" placeholder="Location" required />
-      </div>
-
-      <h3>Other info</h3>
-      <div class="field">
-        <label for="date">Date</label>
-        <input id="date" v-model="event.date" type="date" />
-      </div>
-
-      <div class="field">
-        <label for="time">Time</label>
-        <input id="time" v-model="event.time" type="time" />
-      </div>
-
-      <div class="field">
-        <label for="organizer">Organizer</label>
-        <select id="organizer" v-model="event.organizer">
-          <option :value="null" disabled>Select organizer</option>
-          <option v-for="org in organizers" :key="org.id" :value="org">
-            {{ org.organizerName }}
+        <label for="organizer">Select an Organizer</label>
+        <select id="organizer" v-model="event.organizer.id">
+          <option disabled value="0">-- Please select an organizer --</option>
+          <option 
+            v-for="option in organizers" 
+            :key="option.id" 
+            :value="option.id"
+          >
+            {{ option.name }}
           </option>
         </select>
       </div>
 
-
-
+      <!-- Pets Allowed -->
       <div class="field checkbox">
         <label>
           <input v-model="event.petsAllowed" type="checkbox" />
@@ -104,9 +92,11 @@ function saveEvent() {
         </label>
       </div>
 
+      <!-- Submit -->
       <button class="button -fill-gradient" type="submit">Submit</button>
     </form>
 
+    <!-- Debug -->
     <pre>{{ event }}</pre>
   </div>
 </template>

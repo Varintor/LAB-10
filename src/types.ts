@@ -1,7 +1,6 @@
 export interface Organizer {
   id: number
-  organizerName: string
-  address: string
+  name: string
 }
 
 export interface Event {
@@ -13,7 +12,7 @@ export interface Event {
   date: string
   time: string
   petsAllowed: boolean
-  organizer: Organizer | null   // 💡 organizer เป็น object
+  organizer: Organizer    // 💡 organizer เป็น object
 }
 
 export interface MessageState {
