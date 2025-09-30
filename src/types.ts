@@ -13,6 +13,7 @@ export interface Event {
   time: string
   petsAllowed: boolean
   organizer: Organizer    // 💡 organizer เป็น object
+  images: string[]      
 }
 
 export interface MessageState {

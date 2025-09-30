@@ -7,6 +7,7 @@ import EventService from '@/services/EventService'
 import OrganizerService from '@/services/OrganizerService'  // ✅ เพิ่ม OrganizerService
 import BaseInput from '@/components/BaseInput.vue'
 import BaseSelect from '@/components/BaseSelect.vue'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 
 
@@ -34,7 +35,8 @@ const event = ref<Event>({
   organizer: {
     id: 0,
     name: ''
-  }
+  },
+  images: []
 })
 
 const router = useRouter()
@@ -83,11 +85,7 @@ function saveEvent() {
       <!-- Organizer -->
       <section>
         <h2 class="section-title">Organizer</h2>
-        <BaseSelect
-          v-model="event.organizer.id"
-          :options="organizers"
-          label="Select Organizer"
-        />
+        <BaseSelect v-model="event.organizer.id" :options="organizers" label="Select Organizer" />
       </section>
 
       <!-- Other -->
@@ -99,6 +97,8 @@ function saveEvent() {
             Pets allowed?
           </label>
         </div>
+        <h3>The image of the Event</h3>
+        <ImageUpload v-model="event.images" />
       </section>
 
       <!-- Submit -->
@@ -175,4 +175,3 @@ function saveEvent() {
   transform: scale(1.05);
 }
 </style>
-
