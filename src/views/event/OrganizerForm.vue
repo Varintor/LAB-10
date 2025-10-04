@@ -5,28 +5,36 @@ import { useRouter } from 'vue-router'
 import { useMessageStore } from '@/stores/message'
 import OrganizerService from '@/services/OrganizerService'
 import BaseInput from '@/components/BaseInput.vue'
+import ImageUpload from '@/components/ImageUpload.vue'
+
+// ✅ ตัวแปรหลัก organizer
+const organizer = ref<Organizer>({
+  id: 0,
+  name: '',
+  images: []   // รูปภาพหลายไฟล์ เก็บเป็น string[]
+})
 
 const router = useRouter()
 const store = useMessageStore()
 
-// ✨ Organizer object ที่จะส่งไป backend
-const organizer = ref<Organizer>({
-  name: '',
-})
-
+// ✅ Function กด Submit
 function saveOrganizer() {
-  console.log("👉 Sending organizer:", organizer.value)
+  console.log("👉 Organizer before send:", organizer.value)
 
-  OrganizerService.saveOrganizer({
-    name: organizer.value.name   // ✅ ส่งแค่ name
-  })
+  OrganizerService.saveOrganizer({ ...organizer.value })
     .then((response) => {
-      console.log("👉 Saved organizer:", response.data)
+      console.log("✅ Saved organizer:", response.data)
       if (response.data && response.data.id) {
         router.push({ name: 'organizer-detail', params: { id: response.data.id } })
+        store.updateMessage('You successfully added organizer: ' + response.data.name)
+        setTimeout(() => store.resetMessage(), 3000)
       } else {
         store.updateMessage('✅ Added organizer, but no ID returned')
       }
+    })
+    .catch((err) => {
+      console.error("❌ Save failed:", err)
+      router.push({ name: 'network-error-view' })
     })
 }
 </script>
@@ -36,10 +44,16 @@ function saveOrganizer() {
     <h1 class="title">Add Organizer</h1>
 
     <form @submit.prevent="saveOrganizer" class="form-container">
-      <!-- Organizer Name -->
+      <!-- Organizer Info -->
       <section>
         <h2 class="section-title">Organizer Info</h2>
         <BaseInput v-model="organizer.name" type="text" label="Organizer Name" />
+      </section>
+
+      <!-- Upload Image -->
+      <section>
+        <h2 class="section-title">Organizer Image</h2>
+        <ImageUpload v-model="organizer.images" />
       </section>
 
       <!-- Submit -->

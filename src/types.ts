@@ -1,6 +1,7 @@
 export interface Organizer {
   id?: number
   name: string
+  images: string[]   
 }
 
 export interface Event {

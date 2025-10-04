@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: () => []
 })
 
-// แปลง string[] → media object (vue-media-upload format)
+// ✅ แปลง string[] → media object (vue-media-upload format)
 const convertStringToMedia = (str: string[]): any[] => {
   return str.map((element: string) => {
     return { name: element }
@@ -19,21 +19,26 @@ const convertStringToMedia = (str: string[]): any[] => {
 
 const emit = defineEmits(['update:modelValue'])
 
-// แปลง media object → string[] (เอาเฉพาะชื่อไฟล์)
+// ✅ แปลง media object → string[]
 const convertMediaToString = (media: any[]): string[] => {
   const output: string[] = []
   media.forEach((element: any) => {
-    output.push(element.name)
+    // ถ้ามี response.url แปลว่าอัปโหลดสำเร็จ → ใช้ URL จริงแทน name
+    if (element.response && element.response.url) {
+      output.push(element.response.url)
+    } else {
+      output.push(element.name)
+    }
   })
   return output
 }
 
 const media = ref(convertStringToMedia(props.modelValue))
 
-// URL backend API ที่จะรับไฟล์
+// ✅ URL backend สำหรับอัปโหลด
 const uploadUrl = ref(import.meta.env.VITE_UPLOAD_URL)
 
-// handle ตอน upload เสร็จ
+// ✅ handle ตอน upload เสร็จ
 const onChanged = (files: any[]) => {
   emit('update:modelValue', convertMediaToString(files))
 }
@@ -43,7 +48,7 @@ const onChanged = (files: any[]) => {
   <Uploader
     :server="uploadUrl"
     :media="media"
-    name="file"           
+    name="image"        
     @change="onChanged"
   />
 </template>
