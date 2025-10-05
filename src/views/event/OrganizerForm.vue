@@ -53,7 +53,7 @@ function saveOrganizer() {
       <!-- Upload Image -->
       <section>
         <h2 class="section-title">Organizer Image</h2>
-        <ImageUpload v-model="organizer.images" />
+        <ImageUpload v-model="organizer.images" :max="1" />
       </section>
 
       <!-- Submit -->
