@@ -14,6 +14,7 @@ import AddEventView from '@/views/event/EventFormView.vue'
 import AddOrganizerView from '@/views/event/OrganizerForm.vue'
 import organizerlistview from '@/views/OrganizerListView.vue'
 import organizerdetailview from '@/views/OrganizerDetailView.vue'
+import LoginView from '@/views/LoginView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,11 @@ const router = createRouter({
         limit: parseInt(route.query.limit?.toString() || '3') || 3
       })
 
+    },
+    {
+      path: '/login',
+      name:'login',
+      component: LoginView
     },
     {
       path: '/event/:id',
