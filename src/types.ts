@@ -2,6 +2,7 @@ export interface Organizer {
   id?: number
   name: string
   images: string[]   
+  user: string
 }
 
 export interface Event {
@@ -24,3 +25,9 @@ export interface MessageState {
 export interface EventState {
   event: Event | null
 }
+export interface AuthResponse {
+  accessToken: string
+  refreshToken: string
+  user: Organizer
+}
+
