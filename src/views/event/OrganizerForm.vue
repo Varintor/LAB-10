@@ -11,7 +11,9 @@ import ImageUpload from '@/components/ImageUpload.vue'
 const organizer = ref<Organizer>({
   id: 0,
   name: '',
-  images: []   // รูปภาพหลายไฟล์ เก็บเป็น string[]
+  images: [],   // รูปภาพหลายไฟล์ เก็บเป็น string[]
+  roles: []  // เพิ่ม roles เป็น string array
+  
 })
 
 const router = useRouter()

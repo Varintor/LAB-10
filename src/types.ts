@@ -2,7 +2,7 @@ export interface Organizer {
   id?: number
   name: string
   images: string[]   
-  user: string
+  roles: string[]
 }
 
 export interface Event {

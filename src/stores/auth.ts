@@ -15,16 +15,16 @@ export const useAuthStore = defineStore('auth', {
         token: null as string | null,
         user: null as Organizer | null
     }),
-    getters: {
-  currentUserName(): string {
-    return this.user?.name || ''
-  },
-  //isAdmin(): boolean {
-   // return this.user?.roles.includes('ROLE_ADMIN') || false
-  //},
-  authorizationHeader(): string {
-    return `Bearer ${this.token}`
-  }
+getters: {
+    currentUserName: (state): string => {
+        return state.user?.name || ''
+    },
+     isAdmin: (state): boolean => {
+     return state.user?.roles.includes('ROLE_ADMIN') || false
+     },
+    authorizationHeader: (state): string => {
+        return `Bearer ${state.token}`
+    }
 },
     actions: {
         login(email:string, password: string){
@@ -49,6 +49,24 @@ export const useAuthStore = defineStore('auth', {
         reload(token:string,user: Organizer){
             this.token = token
             this.user = user
-        }
+        },
+        register(firstname: string, lastname: string, email: string, password: string) {
+        return apiClient.post('/api/v1/auth/register', {
+            firstname: firstname,
+            lastname: lastname,
+            email: email,
+            password: password
+        }).then((response) => {
+            this.token = response.data.access_token
+                this.user = response.data.user
+                localStorage.setItem('access_token', this.token as string)
+                localStorage.setItem('user', JSON.stringify(this.user))
+            return response
+        })
+    }
     }
 })
+
+function isAdmin() {
+    throw new Error('Function not implemented.')
+}
