@@ -16,10 +16,16 @@ export const useAuthStore = defineStore('auth', {
         user: null as Organizer | null
     }),
     getters: {
-        currentUserName():string{
-            return this.user?.name||''
-        }
-    },
+  currentUserName(): string {
+    return this.user?.name || ''
+  },
+  //isAdmin(): boolean {
+   // return this.user?.roles.includes('ROLE_ADMIN') || false
+  //},
+  authorizationHeader(): string {
+    return `Bearer ${this.token}`
+  }
+},
     actions: {
         login(email:string, password: string){
             return apiClient.post('/api/v1/auth/authenticate', {
@@ -32,7 +38,8 @@ export const useAuthStore = defineStore('auth', {
                 localStorage.setItem('user', JSON.stringify(this.user))
                 return response
             })
-        },logout(){
+        },
+        logout(){
             console.log('Logging out')
             this.token = null
             this.user = null
